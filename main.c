@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <raylib.h>
 #include <string.h>
+#include <math.h>
 
 const double G = 6.67e-11;
 const double AU = (149.6e6 * 1000); //149.6 million km, in meters.
@@ -17,13 +18,12 @@ typedef struct Body {
   double mass;
   Color color;
   Vector2 velocity;
-  int orbit;
 } Body;
 
 void drawBody(Body b) {
   float x, y;
-  x = b.pos.x * SCALE + width/2;
-  y = b.pos.y * SCALE + height/2;
+  x = b.pos.x * SCALE + (float)width/2;
+  y = b.pos.y * SCALE + (float)height/2;
   
   DrawCircle(x, y, b.radius, b.color);
 }
@@ -37,7 +37,7 @@ double gForce(Body a, Body b) {
   return (G*(a.mass*b.mass))/(d*d);
 }
 
-Body makeBody(float posx, float posy, float radius, double mass, Color color, int orbit) {
+Body makeBody(float posx, float posy, float radius, double mass, Color color) {
   Body b;
   b.pos.x = posx;
   b.pos.y = posy;
@@ -46,8 +46,11 @@ Body makeBody(float posx, float posy, float radius, double mass, Color color, in
   b.color = color;
   b.velocity.x = 0.0;
   b.velocity.y = 0.0;
-  b,orbit = orbit;
   return b;
+}
+
+void updateBodies(Body *bodies) {
+
 }
 
 int main () {
@@ -56,14 +59,14 @@ int main () {
   int timestep = 24*3600;
 
   InitWindow(width, height, "my window");
-  
-  Body sun = makeBody(0.0, 0.0, 30.0, 1.98892 * pow(10, 30), YELLOW, 0);
-  Body b = makeBody(0.0, 0.0, 10.0,   5.9742*pow(10, 24), BLUE, 1);
+  SetWindowState(FLAG_WINDOW_RESIZABLE);
+
+  Body sun = makeBody(0.0, 0.0, 30.0, 1.98892 * pow(10, 30), YELLOW);
+  Body b = makeBody(0.0, 0.0, 10.0,   5.9742*pow(10, 24), BLUE);
   
   b.pos.x = -1*AU;
   b.velocity.y = 29.783 * 1000; //km/s
 
-  printf("%f %f", sun.pos, sun.pos);
   SetTargetFPS(60);
 
   int display = GetCurrentMonitor();
@@ -86,7 +89,7 @@ int main () {
     b.pos.y += b.velocity.y * timestep;
 
     // sleep(1);
-    printf("gf=%lf gfx=%lf gfy=%lf dx=%lf dy=%lf bvx=%f bvy=%f\n", gf, gfx, gfy, dx, dy, b.velocity.x, b.velocity.y);
+    // printf("gf=%lf gfx=%lf gfy=%lf dx=%lf dy=%lf bvx=%f bvy=%f\n", gf, gfx, gfy, dx, dy, b.velocity.x, b.velocity.y);
 
     BeginDrawing();
     ClearBackground(BLACK);
@@ -95,14 +98,14 @@ int main () {
     drawBody(b);
     EndDrawing();
 
-    // if(GetKeyPressed() == KEY_F) {
-    //   if(IsWindowFullscreen()) {
-    //     SetWindowSize(width, height);
-    //   } else {
-    //     SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-    //   }
-    //   ToggleFullscreen();
-    // }
+    if(GetKeyPressed() == KEY_F) {
+      printf("width=%d height=%d\n", GetScreenWidth(), GetScreenHeight());
+
+      if(!IsWindowFullscreen()) {
+        SetWindowSize(1920, 1080);
+      }
+      ToggleFullscreen();
+    }
     
   }
 
