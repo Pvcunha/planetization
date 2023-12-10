@@ -9,8 +9,8 @@ const double G = 6.67e-11;
 const double AU = (149.6e6 * 1000); //149.6 million km, in meters.
 const double SCALE = 250 / AU;
 
-int width = 1280;
-int height = 680;
+int width = 480;
+int height = 240;
 
 typedef struct Body {
   Vector2 pos;
@@ -53,6 +53,19 @@ void updateBodies(Body *bodies) {
 
 }
 
+void togglefullscreen(int w, int h) {
+  
+  if(!IsWindowFullscreen()) {
+    int monitor = GetCurrentMonitor();
+    SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor) );
+    ToggleFullscreen();
+  } 
+  // else {
+  //   // ToggleFullscreen();
+  //   SetWindowSize(w, h);
+  // }
+}
+
 int main () {
   
 
@@ -69,7 +82,6 @@ int main () {
 
   SetTargetFPS(60);
 
-  int display = GetCurrentMonitor();
 
   while(!WindowShouldClose()) {
 
@@ -99,12 +111,7 @@ int main () {
     EndDrawing();
 
     if(GetKeyPressed() == KEY_F) {
-      printf("width=%d height=%d\n", GetScreenWidth(), GetScreenHeight());
-
-      if(!IsWindowFullscreen()) {
-        SetWindowSize(1920, 1080);
-      }
-      ToggleFullscreen();
+      togglefullscreen(width, height);
     }
     
   }
