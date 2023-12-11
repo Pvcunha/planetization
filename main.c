@@ -80,7 +80,6 @@ void updateBodies(Body *bodies, int bodiesSize) {
     bodies[i].pos.x += bodies[i].velocity.x * timestep;
     bodies[i].pos.y += bodies[i].velocity.y * timestep;
   }
-  printf("%f %f\n", bodies[1].pos.x, bodies[1].pos.y);
 
 }
 
@@ -105,36 +104,23 @@ int main () {
   // SetWindowState(FLAG_WINDOW_RESIZABLE);
 
   Body sun = makeBody(0.0, 0.0, 30.0, 1.98892 * pow(10, 30), YELLOW);
-  Body earth = makeBody(-1*AU, 0.0, 10.0,   5.9742*pow(10, 24), BLUE);
 
+  Body earth = makeBody(-1*AU, 0.0, 10.0,   5.9742*pow(10, 24), BLUE);
   earth.velocity.y = 29.783 * 1000; //km/s
+
+  Body venus = makeBody(0.723*AU, 0.0, 5.0, 4.865 * pow(10, 24), PURPLE); 
+  venus.velocity.y = -35.02 * 1000;
 
   SetTargetFPS(60);
   
-  int size = 2;
+  int size = 3;
   Body *bodies = (Body *)malloc(size*sizeof(Body));
   bodies[0] = sun;
   bodies[1] = earth;
-  
+  bodies[2] = venus;
+
   while(!WindowShouldClose()) {
 
-    // double dx = (sun.pos.x - b.pos.x);
-    // double dy = (sun.pos.y - b.pos.y);
-    // double d = norm(sun.pos, b.pos);
-    //
-    // double gf = gForce(sun, b);
-    //
-    // double gfx = gf*(dx/d);
-    // double gfy = gf*(dy/d);
-    //
-    // b.velocity.x += gfx/b.mass * timestep ;
-    // b.velocity.y += gfy/b.mass * timestep ;
-    // 
-    // b.pos.x += b.velocity.x * timestep;
-    // b.pos.y += b.velocity.y * timestep;
-    //
-    // sleep(1);
-    // printf("gf=%lf gfx=%lf gfy=%lf dx=%lf dy=%lf bvx=%f bvy=%f\n", gf, gfx, gfy, dx, dy, b.velocity.x, b.velocity.y);
     updateBodies(bodies, size);  
     BeginDrawing();
     ClearBackground(BLACK);
