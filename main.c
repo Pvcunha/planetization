@@ -5,14 +5,20 @@
 #include <string.h>
 #include <math.h>
 
+#define MIN_WIDTH 800
+#define MIN_HEIGHT 800
+
+// TODO: min max para raio dos planetas
+// TODO: fator de aceleracao do tempo
+
 const double G = 6.67e-11;
 const double AU = (149.6e6 * 1000); //149.6 million km, in meters.
-const double SCALE = 250 / AU;
+const double SCALE = 75/ AU;
 
 const int timestep = 24*3600;
 
 int width = 800;
-int height = 400;
+int height = 800;
 
 typedef struct Body {
   Vector2 pos;
@@ -84,16 +90,64 @@ void updateBodies(Body *bodies, int bodiesSize) {
 }
 
 void togglefullscreen(int w, int h) {
-  SetWindowState(FLAG_WINDOW_UNDECORATED);  
   if(!IsWindowFullscreen()) {
     int monitor = GetCurrentMonitor();
+    width = GetMonitorWidth(monitor);
+    height = GetMonitorHeight(monitor);
     SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
     ToggleFullscreen();
   } 
-  // else {
-  //   // ToggleFullscreen();
-  //   SetWindowSize(w, h);
-  // }
+  else {
+    ToggleFullscreen();
+    SetWindowSize(w, h);
+    width = w;
+    height = h;
+  }
+}
+
+Body *setupPlanets(int size) {
+  
+  // factsheet https://nssdc.gsfc.nasa.gov/planetary/factsheet/
+
+  Body sun = makeBody(0.0, 0.0, 18.0, 1.98892 * pow(10, 30), YELLOW);
+
+  Body earth = makeBody(-1*AU, 0.0, 9.0,   5.9742*pow(10, 24), BLUE);
+  earth.velocity.y = 29.783 * 1000; //km/s
+
+  Body venus = makeBody(0.723*AU, 0.0, 5.0, 4.865 * pow(10, 24), PURPLE); 
+  venus.velocity.y = -35.02 * 1000;
+
+  Body mercury = makeBody(-0.388*AU, 0.0, 3.5, 0.33*pow(10,24), GREEN);
+  mercury.velocity.y = 47.4*1000;
+
+  Body mars = makeBody(1.53*AU, 0.0, 5, 0.642*pow(10, 24), BROWN);
+  mars.velocity.y = -24.1 * 1000;
+
+  Body jupiter = makeBody(5.22*AU, 0.0, 12, 1898*pow(10,24), GRAY);
+  jupiter.velocity.y = 13.1 * 1000;
+
+  Body saturn = makeBody(-9.61*AU, 0.0, 10, 568*pow(10,24), RED);
+  saturn.velocity.y = 9.7 * 1000;
+  
+  Body uranus = makeBody(19.1*AU, 0.0, 8, 86.8*pow(10,24), PINK);
+  uranus.velocity.y = 6.8 * 1000;
+
+  Body neptune = makeBody(-30.3*AU, 0.0, 8, 102*pow(10, 24), DARKPURPLE);
+  neptune.velocity.y = -5.4 * 1000;
+
+  Body *bodies = (Body *)malloc(size*sizeof(Body));
+
+  bodies[0] = sun;
+  bodies[1] = earth;
+  bodies[2] = venus;
+  bodies[3] = mercury;
+  bodies[4] = mars;
+  bodies[5] = jupiter;
+  bodies[6] = saturn;
+  bodies[7] = uranus;
+  bodies[8] = neptune;
+
+  return bodies;
 }
 
 int main () {
@@ -101,23 +155,13 @@ int main () {
 
 
   InitWindow(width, height, "my window");
-  // SetWindowState(FLAG_WINDOW_RESIZABLE);
+  SetWindowState(FLAG_WINDOW_RESIZABLE);
 
-  Body sun = makeBody(0.0, 0.0, 30.0, 1.98892 * pow(10, 30), YELLOW);
-
-  Body earth = makeBody(-1*AU, 0.0, 10.0,   5.9742*pow(10, 24), BLUE);
-  earth.velocity.y = 29.783 * 1000; //km/s
-
-  Body venus = makeBody(0.723*AU, 0.0, 5.0, 4.865 * pow(10, 24), PURPLE); 
-  venus.velocity.y = -35.02 * 1000;
+  
 
   SetTargetFPS(60);
-  
-  int size = 3;
-  Body *bodies = (Body *)malloc(size*sizeof(Body));
-  bodies[0] = sun;
-  bodies[1] = earth;
-  bodies[2] = venus;
+  int size = 9;
+  Body *bodies = setupPlanets(size);
 
   while(!WindowShouldClose()) {
 
@@ -127,17 +171,15 @@ int main () {
     
     for(int i = 0; i < size; i++) {
       drawBody(bodies[i]);
-      // printf("%d = (%f %f)\n", i, bodies[i].pos.x, bodies[i].pos.y);
     }
-    // drawBody(sun);
-    // drawBody(b);
     EndDrawing();
 
     if(GetKeyPressed() == KEY_F) {
-      togglefullscreen(width, height);
+      togglefullscreen(MIN_WIDTH, MIN_HEIGHT);
     }
-    
   }
+
+  free(bodies);
 
   return 0;
 }
